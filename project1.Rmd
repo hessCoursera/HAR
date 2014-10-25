@@ -9,6 +9,7 @@ output: html_document
 
 # Executive summary
 # Analysis
+A machine learning algrithm based on the random forest approach including cross-validation (10x10) has been performed leading to an out-of-sample error of `1-0.9878` or `1.2%`.
 ## Loading data
 Loading the data and splitting it to experiment on the model
 ```{r setup, cache = F, echo = F, message = F, warning = F, tidy = F}
@@ -67,9 +68,10 @@ drp <- c(drp,names(mytrain_red[grepl('_z',names(mytrain_red))]))
 mytrain_red4 <- mytrain_red[,!(names(mytrain_red) %in% drp)]
 dim(mytrain_red4)
 ```
-reduced dimensions to 17. Now using the Random forest of the 'caret package' because it tries multiple values for several of the key model parameters and performs a more elaborate form of cross-validation. Furthermore computing an out of sample error:
+reduced dimensions to 17. Now using the Random forest of the 'caret package' because it tries multiple values for several of the key model parameters. The choice is to do 10 repeats of 10-fold cross-validation. Furthermore computing an out of sample error:
 ```{r rfr4,dependson="red4"}
-modelrf4 <- train(classe ~ ., method='rf',data=mytrain_red4)
+tc <- trainControl("repeatedcv", number=10, repeats=10, classProbs=TRUE, savePred=T) 
+modelrf4 <- train(classe ~ ., method='rf',data=mytrain_red4,trControl = tc)
 #modelrf4 <- randomForest(classe ~ .,data=mytrain_red4)
 
 prd<-predict(modelrf4,mytest)
